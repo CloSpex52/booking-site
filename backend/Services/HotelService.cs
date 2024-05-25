@@ -17,12 +17,41 @@ namespace MyHotelBookingApp.Services
 
         public async Task<List<Hotel>> GetHotelsAsync()
         {
-            return await _context.Hotels.ToListAsync();
+            try{
+                return await _context.Hotels.ToListAsync();
+            }catch(Exception ex){
+                throw new Exception("Error getting hotels", ex);
+            
+            }
         }
-
+          public async Task<List<Hotel>> GetHotelsByLocationAsync(string location)
+        {
+            try
+            {
+                return await _context.Hotels
+                    .Where(h => h.Location.Contains(location))
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error getting hotels by location", ex);
+            }
+        }
         public async Task<Hotel> GetHotelByIdAsync(int id)
         {
-            return await _context.Hotels.FindAsync(id);
+            try
+            { 
+                var hotel = await _context.Hotels.FindAsync(id);
+                if (hotel == null)
+                {
+                    throw new Exception("Hotel not found");
+                }
+                return hotel;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error getting hotel", ex);
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ import BookingForm from "../components/BookingForm";
 import { getHotelById } from "../services/api";
 
 const HotelPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id = "" } = useParams<{ id: string }>();
   const [hotel, setHotel] = useState<Hotel | null>(null);
 
   useEffect(() => {
@@ -29,9 +29,14 @@ const HotelPage: React.FC = () => {
         src={hotel.pictureUrl}
         alt={hotel.name}
         className="my-3"
-        style={{ maxHeight: "300px", maxWidth: "300px" }}
+        style={{
+          maxHeight: "300px",
+          maxWidth: "300px",
+          borderRadius: "10px",
+          border: "solid black 3px",
+        }}
       />
-      <BookingForm hotelId={hotel.id} />
+      <BookingForm hotel={hotel} />
     </div>
   );
 };

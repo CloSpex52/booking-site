@@ -22,30 +22,31 @@ public class Startup
         services.AddScoped<BookingService>();
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+   public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    if (env.IsDevelopment())
     {
-        if (env.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
-        }
-
-        app.UseHttpsRedirection();
-
-        app.UseRouting();
-
-        app.UseCors();
-
-        app.UseAuthorization();
-
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllers();
-        });
-
-        using (var scope = app.ApplicationServices.CreateScope())
-        {
-            var services = scope.ServiceProvider;
-            SeedData.Initialize(services);
-        }
+        app.UseDeveloperExceptionPage();
     }
+
+    app.UseHttpsRedirection();
+
+    app.UseRouting();
+
+    app.UseCors();
+
+    app.UseAuthorization();
+
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+    });
+
+    using (var scope = app.ApplicationServices.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        SeedData.Initialize(services);
+    }
+}
+
 }

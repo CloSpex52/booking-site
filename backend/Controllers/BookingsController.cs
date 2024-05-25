@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using MyHotelBookingApp.Data;
 using MyHotelBookingApp.Models;
-using MyHotelBookingApp.Services; 
+using MyHotelBookingApp.DTOs;
+using MyHotelBookingApp.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
 
 namespace MyHotelBookingApp.Controllers
 {
@@ -13,26 +15,46 @@ namespace MyHotelBookingApp.Controllers
     {
         private readonly BookingService _bookingService;
 
-        public BookingsController(BookingService bookingService) 
+        public BookingsController(BookingService bookingService)
         {
-            _bookingService = bookingService; 
+            _bookingService = bookingService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Booking>>> GetBookings()
         {
-             Console.WriteLine("START GET BOOKING");
-            var bookings = await _bookingService.GetBookingsAsync(); 
+            try{
+            var bookings = await _bookingService.GetBookingsAsync();
             return Ok(bookings);
+            }catch(Exception ex){
+                return BadRequest(new { message = "Error getting bookings", details = ex.Message });
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<Booking>> CreateBooking(Booking booking)
+        public async Task<ActionResult<Booking>> CreateBooking([FromBody] BookingDto bookingDto)
         {
-            Console.WriteLine("START POST BOOKING");
-            var createdBooking = await _bookingService.CreateBookingAsync(booking);
-            Console.WriteLine("AFTER BOOK");
-            return CreatedAtAction(nameof(GetBookings), new { id = createdBooking.Id }, createdBooking);
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var booking = new Booking
+                {
+                    HotelId = bookingDto.HotelId,
+                    RoomType = bookingDto.RoomType,
+                    BreakfastIncluded = bookingDto.BreakfastIncluded,
+                    CheckInDate = bookingDto.CheckInDate,
+                    CheckOutDate = bookingDto.CheckOutDate
+                };
+                var createdBooking = await _bookingService.CreateBookingAsync(booking);
+                return CreatedAtAction(nameof(GetBookings), new { id = createdBooking.Id }, createdBooking);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error creating booking", details = ex.Message });
+            }
         }
     }
 }
